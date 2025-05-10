@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Generator Modern</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #ffffff;
+            --left-column-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            display: flex;
+            gap: 20px;
+            background-color: var(--background-color);
+        }
+
+        .input-section {
+            width: 400px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .preview-section {
+            flex-grow: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .cv-layout {
+            display: flex;
+            gap: 20px;
+        }
+
+        .left-column {
+            width: 35%;
+            background: var(--left-column-bg);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .right-column {
+            width: 65%;
+            padding: 20px;
+        }
+
+        #cv-photo img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .contact-icon {
+            width: 25px;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .theme-option {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 5px;
+            border: 2px solid #fff;
+        }
+
+        .theme-1 { background: linear-gradient(45deg, #2c3e50, #3498db); }
+        .theme-2 { background: linear-gradient(45deg, #e74c3c, #e67e22); }
+        .theme-3 { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+        .theme-4 { background: linear-gradient(45deg, #9b59b6, #8e44ad); }
+        .theme-5 { background: linear-gradient(45deg, #34495e, #7f8c8d); }
+        .theme-6 { background: linear-gradient(45deg, #16a085, #1abc9c); }
+        .theme-7 { background: linear-gradient(45deg, #c0392b, #d35400); }
+        .theme-8 { background: linear-gradient(45deg, #2980b9, #3498db); }
+        .theme-9 { background: linear-gradient(45deg, #8e44ad, #9b59b6); }
+        .theme-10 { background: linear-gradient(45deg, #2c3e50, #34495e); }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 3px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="input-section">
+        <h2>Input Data</h2>
+        
+        <div class="input-group">
+            <label>Pilih Tema:</label>
+            <div id="theme-selector" style="display: flex; flex-wrap: wrap;">
+                <div class="theme-option theme-1 selected" data-theme="1" onclick="selectTheme(1)"></div>
+                <div class="theme-option theme-2" data-theme="2" onclick="selectTheme(2)"></div>
+                <div class="theme-option theme-3" data-theme="3" onclick="selectTheme(3)"></div>
+                <div class="theme-option theme-4" data-theme="4" onclick="selectTheme(4)"></div>
+                <div class="theme-option theme-5" data-theme="5" onclick="selectTheme(5)"></div>
+                <div class="theme-option theme-6" data-theme="6" onclick="selectTheme(6)"></div>
+                <div class="theme-option theme-7" data-theme="7" onclick="selectTheme(7)"></div>
+                <div class="theme-option theme-8" data-theme="8" onclick="selectTheme(8)"></div>
+                <div class="theme-option theme-9" data-theme="9" onclick="selectTheme(9)"></div>
+                <div class="theme-option theme-10" data-theme="10" onclick="selectTheme(10)"></div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Foto Profil:</label>
+            <input type="file" id="photo-upload" accept="image/*">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-phone"></i> Nomor Telepon:</label>
+            <input type="tel" id="phone">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-envelope"></i> Email:</label>
+            <input type="email" id="email">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-map-marker-alt"></i> Alamat:</label>
+            <textarea id="address" rows="3"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fab fa-facebook"></i> Facebook:</label>
+            <input type="text" id="facebook">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fab fa-instagram"></i> Instagram:</label>
+            <input type="text" id="instagram">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fab fa-x-twitter"></i> X (Twitter):</label>
+            <input type="text" id="twitter">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fab fa-linkedin"></i> LinkedIn:</label>
+            <input type="text" id="linkedin">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fab fa-youtube"></i> YouTube:</label>
+            <input type="text" id="youtube">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fab fa-tiktok"></i> TikTok:</label>
+            <input type="text" id="tiktok">
+        </div>
+
+        <div class="input-group">
+            <label>Nama Lengkap:</label>
+            <input type="text" id="full-name">
+        </div>
+
+        <div class="input-group">
+            <label>Profil Singkat:</label>
+            <textarea id="profile" rows="3"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Riwayat Pendidikan:</label>
+            <textarea id="education" rows="5"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Keahlian (pisahkan dengan koma):</label>
+            <textarea id="skills" rows="3"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Riwayat Pekerjaan:</label>
+            <textarea id="work-experience" rows="5"></textarea>
+        </div>
+
+        <button onclick="generatePDF()">Export ke PDF</button>
+    </div>
+
+    <div class="preview-section">
+        <div class="cv-layout">
+            <div class="left-column">
+                <div id="cv-photo"></div>
+                
+                <h3>Kontak</h3>
+                <div class="contact-item">
+                    <i class="fas fa-phone contact-icon"></i>
+                    <span id="cv-phone"></span>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-envelope contact-icon"></i>
+                    <span id="cv-email"></span>
+                </div>
+                
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt contact-icon"></i>
+                    <span id="cv-address"></span>
+                </div>
+
+                <h3>Sosial Media</h3>
+                <div class="social-links" id="cv-social"></div>
+            </div>
+
+            <div class="right-column">
+                <h1 id="cv-name"></h1>
+                
+                <div class="section">
+                    <h2 class="section-title">Profil</h2>
+                    <p id="cv-profile"></p>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Riwayat Pendidikan</h2>
+                    <div id="cv-education"></div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Keahlian</h2>
+                    <div id="cv-skills"></div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Riwayat Pekerjaan</h2>
+                    <div id="cv-work"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const themes = {
+            1: { primary: "#2c3e50", secondary: "#3498db", background: "#ffffff", leftColumn: "#f8f9fa" },
+            2: { primary: "#e74c3c", secondary: "#e67e22", background: "#f9ebea", leftColumn: "#f5d6d3" },
+            3: { primary: "#27ae60", secondary: "#2ecc71", background: "#e8f6f3", leftColumn: "#d4efdf" },
+            4: { primary: "#9b59b6", secondary: "#8e44ad", background: "#f5eef8", leftColumn: "#e8dff2" },
+            5: { primary: "#34495e", secondary: "#7f8c8d", background: "#ebedef", leftColumn: "#d6dbdf" },
+            6: { primary: "#16a085", secondary: "#1abc9c", background: "#d1f2eb", leftColumn: "#a2d9ce" },
+            7: { primary: "#c0392b", secondary: "#d35400", background: "#fdedec", leftColumn: "#fadbd8" },
+            8: { primary: "#2980b9", secondary: "#3498db", background: "#eaf2f8", leftColumn: "#d4e6f1" },
+            9: { primary: "#8e44ad", secondary: "#9b59b6", background: "#f5eef8", leftColumn: "#e8dff2" },
+            10: { primary: "#2c3e50", secondary: "#34495e", background: "#ebedef", leftColumn: "#d6dbdf" }
+        };
+
+        let selectedTheme = 1;
+
+        function selectTheme(themeNumber) {
+            selectedTheme = themeNumber;
+            const theme = themes[themeNumber];
+            
+            document.documentElement.style.setProperty('--primary-color', theme.primary);
+            document.documentElement.style.setProperty('--secondary-color', theme.secondary);
+            document.documentElement.style.setProperty('--left-column-bg', theme.leftColumn);
+            document.body.style.backgroundColor = theme.background;
+            
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`[data-theme="${themeNumber}"]`).classList.add('selected');
+        }
+
+        function updatePreview() {
+            document.getElementById('cv-phone').textContent = document.getElementById('phone').value;
+            document.getElementById('cv-email').textContent = document.getElementById('email').value;
+            document.getElementById('cv-address').textContent = document.getElementById('address').value;
+
+            const socials = {
+                facebook: document.getElementById('facebook').value,
+                instagram: document.getElementById('instagram').value,
+                twitter: document.getElementById('twitter').value,
+                linkedin: document.getElementById('linkedin').value,
+                youtube: document.getElementById('youtube').value,
+                tiktok: document.getElementById('tiktok').value
+            };
+
+            let socialHTML = '';
+            for (const [platform, username] of Object.entries(socials)) {
+                if (username) {
+                    socialHTML += `
+                        <div class="contact-item">
+                            <i class="fab fa-${platform} contact-icon"></i>
+                            <span>${username}</span>
+                        </div>`;
+                }
+            }
+            document.getElementById('cv-social').innerHTML = socialHTML;
+
+            document.getElementById('cv-name').textContent = document.getElementById('full-name').value;
+            document.getElementById('cv-profile').innerHTML = document.getElementById('profile').value.replace(/\n/g, '<br>');
+            document.getElementById('cv-education').innerHTML = document.getElementById('education').value.replace(/\n/g, '<br>');
+            document.getElementById('cv-work').innerHTML = document.getElementById('work-experience').value.replace(/\n/g, '<br>');
+
+            const skills = document.getElementById('skills').value.split(',').map(skill => skill.trim());
+            document.getElementById('cv-skills').innerHTML = skills
+                .filter(skill => skill)
+                .map(skill => `<div class="skill-tag">${skill}</div>`)
+                .join('');
+        }
+
+        function generatePDF() {
+            const doc = new jspdf.jsPDF();
+            const theme = themes[selectedTheme];
+            const pageWidth = doc.internal.pageSize.width;
+            const leftColWidth = pageWidth * 0.35;
+
+            // Background kolom kiri
+            doc.setFillColor(theme.leftColumn);
+            doc.rect(0, 40, leftColWidth, doc.internal.pageSize.height - 40, 'F');
+
+            // Header
+            doc.setFillColor(theme.primary);
+            doc.rect(0, 0, pageWidth, 40, 'F');
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.line(0, 40, pageWidth, 40);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.text(document.getElementById('full-name').value, 15, 25);
+
+            // Kolom kiri
+            let yPosition = 50;
+
+            // Foto
+            const photo = document.querySelector('#cv-photo img');
+            if (photo) {
+                const imgData = photo.src;
+                doc.addImage(imgData, 'JPEG', 15, yPosition, leftColWidth - 30, 80);
+                yPosition += 90;
+            }
+
+            // Kontak
+            doc.setTextColor(theme.primary);
+            doc.setFontSize(14);
+            doc.text('Kontak', 15, yPosition);
+            yPosition += 10;
+
+            const contacts = [
+                { icon: '📞', text: document.getElementById('phone').value },
+                { icon: '📧', text: document.getElementById('email').value },
+                { icon: '📍', text: document.getElementById('address').value }
+            ];
+
+            contacts.forEach(contact => {
+                if (contact.text) {
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`${contact.icon} ${contact.text}`, 15, yPosition);
+                    yPosition += 7;
+                }
+            });
+
+            // Sosial Media
+            yPosition += 10;
+            doc.setTextColor(theme.primary);
+            doc.setFontSize(14);
+            doc.text('Sosial Media', 15, yPosition);
+            yPosition += 10;
+
+            const socialIcons = {
+                facebook: '󰈎',
+                instagram: '󰈰',
+                twitter: '󰈁',
+                linkedin: '󰈬',
+                youtube: '󰗃',
+                tiktok: '󰚠'
+            };
+
+            Object.entries({
+                facebook: document.getElementById('facebook').value,
+                instagram: document.getElementById('instagram').value,
+                twitter: document.getElementById('twitter').value,
+                linkedin: document.getElementById('linkedin').value,
+                youtube: document.getElementById('youtube').value,
+                tiktok: document.getElementById('tiktok').value
+            }).forEach(([platform, username]) => {
+                if (username) {
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`${socialIcons[platform]} ${username}`, 15, yPosition);
+                    yPosition += 7;
+                }
+            });
+
+            // Kolom kanan
+            let yRight = 50;
+
+            // Profil
+            doc.setFontSize(14);
+            doc.setTextColor(theme.primary);
+            doc.text('Profil', leftColWidth + 15, yRight);
+            doc.setDrawColor(theme.secondary);
+            doc.line(leftColWidth + 15, yRight + 2, leftColWidth + 15 + doc.getTextWidth('Profil'), yRight + 2);
+            
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            const profileText = doc.splitTextToSize(document.getElementById('profile').value, pageWidth - leftColWidth - 30);
+            doc.text(profileText, leftColWidth + 15, yRight + 10);
+            yRight += 10 + (profileText.length * 5) + 10;
+
+            // Pendidikan
+            doc.setFontSize(14);
+            doc.setTextColor(theme.primary);
+            doc.text('Riwayat Pendidikan', leftColWidth + 15, yRight);
+            doc.setDrawColor(theme.secondary);
+            doc.line(leftColWidth + 15, yRight + 2, leftColWidth + 15 + doc.getTextWidth('Riwayat Pendidikan'), yRight + 2);
+            
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            const educationText = doc.splitTextToSize(document.getElementById('education').value, pageWidth - leftColWidth - 30);
+            doc.text(educationText, leftColWidth + 15, yRight + 10);
+            yRight += 10 + (educationText.length * 5) + 10;
+
+            // Keahlian
+            doc.setFontSize(14);
+            doc.setTextColor(theme.primary);
+            doc.text('Keahlian', leftColWidth + 15, yRight);
+            doc.setDrawColor(theme.secondary);
+            doc.line(leftColWidth + 15, yRight + 2, leftColWidth + 15 + doc.getTextWidth('Keahlian'), yRight + 2);
+            
+            yRight += 10;
+            const skills = document.getElementById('skills').value.split(',').map(s => s.trim());
+            skills.forEach((skill, index) => {
+                if (skill) {
+                    doc.setFontSize(11);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`• ${skill}`, leftColWidth + 15, yRight + (index * 5));
+                }
+            });
+            yRight += skills.length * 5 + 10;
+
+            // Pekerjaan
+            doc.setFontSize(14);
+            doc.setTextColor(theme.primary);
+            doc.text('Riwayat Pekerjaan', leftColWidth + 15, yRight);
+            doc.setDrawColor(theme.secondary);
+            doc.line(leftColWidth + 15, yRight + 2, leftColWidth + 15 + doc.getTextWidth('Riwayat Pekerjaan'), yRight + 2);
+            
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            const workText = doc.splitTextToSize(document.getElementById('work-experience').value, pageWidth - leftColWidth - 30);
+            doc.text(workText, leftColWidth + 15, yRight + 10);
+
+            doc.save('cv.pdf');
+        }
+
+        document.getElementById('photo-upload').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('cv-photo').innerHTML = 
+                    `<img src="${event.target.result}" style="max-width: 100%">`;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        const allInputs = document.querySelectorAll('input, textarea');
+        allInputs.forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+
+        selectTheme(1);
+    </script>
+</body>
+</html>
